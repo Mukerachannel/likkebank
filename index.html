@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile Banking App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 320px;
+            height: 550px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .app-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .app-header h1 {
+            font-size: 24px;
+            color: #d109d8dc;
+        }
+
+        .app-logo {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        .next-btn {
+            width: 100%;
+            background-color: #d109d8dc;
+            color: white;
+            padding: 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .next-btn:hover {
+            background-color: #d109d8dc;
+        }
+
+        .confirm-btn {
+          background-color: #d109d8dc;
+          color: white;
+          padding: 12px 24px;
+          font-size: 16px;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+        }
+
+        .note {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #888;
+            text-align: center;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.3s;
+        }
+
+        .modal.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .modal-content p {
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #555;
+        }
+
+        .modal-content img {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 20px;
+        }
+
+        .modal-content .large-image {
+            width: 200px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: #555;
+        }
+
+        @media (max-width: 350px) {
+            .container {
+                padding: 15px;
+                height: auto;
+            }
+
+            .app-header h1 {
+                font-size: 20px;
+            }
+
+            .next-btn {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .app-logo {
+                width: 80px;
+                height: 80px;
+                margin-bottom: 15px;
+            }
+
+            .modal-content .large-image {
+                width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="CBE.png" alt="App Logo" class="app-logo">
+        <div class="app-header">
+            <h1>Transfer Money</h1>
+        </div>
+        <form id="transfer-form">
+            <div class="form-group">
+                <label for="account-number">Account Number</label>
+                <input type="text" id="account-number" name="accountNumber" placeholder="Enter account number" required>
+            </div>
+            <div class="form-group">
+                <label for="amount">Amount</label>
+                <input type="number" id="amount" name="amount" placeholder="Enter amount" required>
+            </div>
+            <button type="button" class="next-btn" onclick="handleNext()">Next</button>
+        </form>
+        <p class="note">Please double-check your account number and amount before proceeding.</p>
+    </div>
+
+    <div class="modal" id="confirmation-modal">
+        <div class="modal-content">
+            <h2>Confirm Transaction</h2>
+            <p id="transaction-details"></p>
+            <button class="confirm-btn" onclick="confirmTransaction()">Confirm</button>
+        </div>
+    </div>
+
+    <div class="modal" id="success-modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeSuccessModal()">&times;</button>
+            <img src="CBE.png" alt="QR Code">
+            <h2 style="color: #28a745;">Transaction Successful</h2>
+            <p id="success-message"></p>
+            <img src="pngimg.com - qr_code_PNG33.png" alt="Transaction Successful Image" class="large-image">
+        </div>
+    </div>
+
+    <script>
+        function handleNext() {
+            const accountNumber = document.getElementById('account-number').value;
+            const amount = document.getElementById('amount').value;
+
+            if (!accountNumber || !amount) {
+                alert('Please fill out both fields.');
+                return;
+            }
+
+            if (amount <= 0) {
+                alert('Amount must be greater than zero.');
+                return;
+            }
+
+            const accountHolder = "LIKENESH BEKELE GONSAMOs"; // Placeholder for account holder name
+            const details = `Account Number: ${accountNumber}<br>Account Holder: ${accountHolder}<br>Amount: ${amount} ETB`;
+
+            document.getElementById('transaction-details').innerHTML = details;
+            document.getElementById('confirmation-modal').classList.add('active');
+        }
+
+        function confirmTransaction() {
+            const accountHolderFrom = "YIBEKAL HABTAMU KINDE"; // Placeholder for sender account holder name
+            const accountHolderTo = "LIKENESH BEKELE GONSAMO"; // Placeholder for recipient account holder name
+            const amount = document.getElementById('amount').value;
+            const transactionId = "TX123456789"; // Sample transaction ID
+
+            const message = `${amount} Birr has been successfully transfered from ${accountHolderFrom} to ${accountHolderTo}.<br>Transaction ID: ${transactionId}`;
+
+            document.getElementById('success-message').innerHTML = message;
+            document.getElementById('confirmation-modal').classList.remove('active');
+            document.getElementById('success-modal').classList.add('active');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('success-modal').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
